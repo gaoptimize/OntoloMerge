@@ -1,0 +1,22 @@
+{
+  "modsource": "ontolomerge_github_path_guard_20261103",
+  "date_utc": "2026-11-04T01:45:23.956690+00:00",
+  "editor_tests": 16,
+  "editor_tests_result": "PASS",
+  "browser": "PASS",
+  "renderer": "PASS",
+  "regeneration": "PASS",
+  "kif_git_apply_check": "PASS",
+  "public_schema": "PASS",
+  "public_overlay_round_trip": "PASS",
+  "path_leak_scan": "PASS",
+  "counts": {
+    "edge": 7461,
+    "final_link": 5295,
+    "merged_hole": 316,
+    "node": 7370,
+    "provisional_link": 0
+  },
+  "bastard_classes": 37,
+  "relabel_entries": 68
+}

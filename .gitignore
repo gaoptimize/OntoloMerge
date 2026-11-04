@@ -1,0 +1,8 @@
+# modsource: ontolomerge_github_path_guard_20261103
+**/__pycache__/
+**/editor_workspace/
+**/*-wal
+**/*-shm
+**/editor_test_*
+**/editor_browser_*
+demo-workspace*
