@@ -128,6 +128,7 @@ ed("edPropose").addEventListener("click", () => editorRun(async () => {
 async function loadClassEdits() {
  try {
   const result = await editorRequest("/api/class_edits");
+  const changed=JSON.stringify(classEdits)!==JSON.stringify(result.rows);
   classEdits = result.rows; editorRevision = result.revision;
   ed("editorRevision").textContent = `Workspace revision ${editorRevision} · ${DATA.editor.applied} applied changes in this view`;
   ed("editorQueue").innerHTML = classEdits.length ? classEdits.map(item => {
@@ -139,7 +140,7 @@ async function loadClassEdits() {
      <button data-edit-apply="${item.id}" class="primary" ${stale ? "disabled" : ""}>Apply locally</button>
      <button data-edit-reject="${item.id}">Reject</button>` : `<div class="muted">Reviewed by ${esc(item.decided_by || "")} · ${esc(item.decided_utc || "")}</div>`}</article>`;
   }).join("") : '<p class="muted">No class edits yet.</p>';
-  rebuild();
+  if(changed)rebuild(true);
  } catch (error) { editorError(error.message); }
 }
 ed("editorQueue").addEventListener("click", event => editorRun(async () => {
@@ -190,8 +191,8 @@ nodeTip = function(side, id) {
  return text;
 };
 const originalEditorRebuild = rebuild;
-rebuild = function() {
- originalEditorRebuild();
+rebuild = function(...args) {
+ originalEditorRebuild(...args);
  const pending=classEdits.filter(e=>e.status === "provisional");
  ed("stats").textContent += ` · ${pending.length} class edits pending · local rev ${DATA.editor.revision}`;
  for (const item of pending) {

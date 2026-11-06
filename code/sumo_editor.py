@@ -328,13 +328,16 @@ class Workspace:
         # Rebuild branch selector from the current tree. Frozen mapping evidence
         # remains visible, explicitly marked as requiring review after tree edits.
         stats = defaultdict(lambda: {"sumo": 0, "links": 0, "lcc": set(), "holes": 0})
+        # modsource: codex_ontolomerge_v04_20261105
+        links_by_term = defaultdict(list)
+        for link in data['links']:
+            links_by_term[link['s']].append(link)
         for term, n in nodes.items():
             for branch in n["branches"]:
                 stats[branch]["sumo"] += 1
-                for lk in data["links"]:
-                    if lk["s"] == term:
-                        stats[branch]["links"] += 1
-                        stats[branch]["lcc"].add(lk["l"])
+                for lk in links_by_term[term]:
+                    stats[branch]["links"] += 1
+                    stats[branch]["lcc"].add(lk["l"])
         data["branches"] = [dict(name=b, **{**v, "lcc": len(v["lcc"])})
                             for b, v in sorted(stats.items(), key=lambda kv: (-kv[1]["links"], kv[0]))]
         summary = {"modsource": MODSOURCE, "action": action, "class_name": name, "before": before,

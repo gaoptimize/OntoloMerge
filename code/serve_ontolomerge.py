@@ -52,6 +52,16 @@ def db():
 
 
 def artifact():
+    # modsource: codex_ontolomerge_v04_20261105
+    active = HERE / 'current_release.json'
+    if active.is_file():
+        filename = json.loads(active.read_text(encoding='utf8'))['artifact']
+        if Path(filename).name != filename:
+            raise ValueError('Active artifact must be a filename in the viewer folder')
+        page = HERE / filename
+        if not page.is_file():
+            raise FileNotFoundError(page)
+        return page
     pages = sorted(HERE.glob("ontolomerge_v0_1_*.html"))
     if not pages:
         pages = sorted(HERE.parent.glob("ontolomerge_v0_1_*.html"))
@@ -79,8 +89,15 @@ def direction_ok(payload):
 def validate(con, payload):
     errs = []
     s, l = payload.get("sumo", ""), payload.get("lcc", "")
-    if not con.execute("SELECT 1 FROM node WHERE scheme='SUMO' AND node_id=?",
-                       (s,)).fetchone():
+    known = con.execute("SELECT 1 FROM node WHERE scheme='SUMO' AND node_id=?", (s,)).fetchone()
+    if not known and (HERE / 'current_release.json').is_file():
+        config = json.loads((HERE / 'current_release.json').read_text(encoding='utf8'))
+        filename = config.get('catalog', '')
+        if filename and Path(filename).name == filename and (HERE / filename).is_file():
+            with sqlite3.connect((HERE / filename).as_uri() + '?mode=ro', uri=True) as catalog:
+                known = catalog.execute('SELECT 1 FROM class_symbol WHERE name=? AND reachable=1', (s,)).fetchone()
+            catalog.close()
+    if not known:
         errs.append(f"unknown SUMO class {s!r}")
     if not con.execute("SELECT 1 FROM node WHERE scheme='LCC' AND node_id=?",
                        (l,)).fetchone():

@@ -212,6 +212,12 @@ class EditorTests(unittest.TestCase):
 class RealSnapshotTests(unittest.TestCase):
     def test_real_domain_cycle_refused_in_preview_and_export(self):
         _, data = load_artifact(artifact())
+        # modsource: ontolomerge_v04_public_20261105
+        # Deliberately hide this domain edge so the out-of-view cycle test
+        # retains its meaning even when the selected release includes all files.
+        data['sumo_nodes']['AstronomicalBody']['parents'] = [
+            p for p in data['sumo_nodes']['AstronomicalBody']['parents']
+            if p != 'SelfConnectedObject']
         sources = {p.name: p.read_bytes().decode("utf-8") for p in (HERE.parent / "sumo_src").glob("*.kif")}
         with tempfile.TemporaryDirectory() as temp:
             ws = Workspace(Path(temp) / "cycle.sqlite", data, sources)

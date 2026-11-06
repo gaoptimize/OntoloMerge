@@ -8,7 +8,8 @@ import re
 import secrets
 from http.server import ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
+import sqlite3
 
 from serve_ontolomerge import Handler as MappingHandler, artifact
 from sumo_editor import MODSOURCE, Workspace
@@ -24,10 +25,35 @@ def load_artifact(path):
     return text, json.loads(match[1])
 
 
-def make_handler(workspace, html, token):
+def make_handler(workspace, html, token, catalog_path=None):
     class Handler(MappingHandler):
         def do_GET(self):
             path = urlsplit(self.path).path
+            # modsource: codex_ontolomerge_v04_20261105
+            if path == '/api/catalog':
+                config_path=HERE / 'current_release.json'
+                if catalog_path is None:
+                    if not config_path.is_file(): return self._json({'error':'No active source catalog'},404)
+                    filename=json.loads(config_path.read_text(encoding='utf8')).get('catalog','')
+                    if not filename or Path(filename).name!=filename: return self._json({'error':'Invalid catalog configuration'},500)
+                    selected_catalog=HERE / filename
+                else: selected_catalog=Path(catalog_path)
+                query=parse_qs(urlsplit(self.path).query)
+                try: offset=max(0,int(query.get('offset',['0'])[0]))
+                except ValueError: return self._json({'error':'Invalid offset'},400)
+                clauses,params=[],[]
+                if query.get('file',[''])[0]: clauses.append('file=?');params.append(query['file'][0])
+                if query.get('q',[''])[0]:
+                    clauses.append("text LIKE ? ESCAPE '\\'")
+                    value=query['q'][0].replace('\\','\\\\').replace('%','\\%').replace('_','\\_')
+                    params.append('%'+value+'%')
+                where=' WHERE '+' AND '.join(clauses) if clauses else ''
+                con=sqlite3.connect(selected_catalog.as_uri()+'?mode=ro',uri=True)
+                try:
+                    total=con.execute('SELECT count(*) FROM assertion'+where,params).fetchone()[0]
+                    rows=con.execute('SELECT file,line,text FROM assertion'+where+' ORDER BY id LIMIT 25 OFFSET ?',params+[offset]).fetchall()
+                finally: con.close()
+                return self._json({'total':total,'offset':offset,'rows':[dict(file=f,line=l,text=t) for f,l,t in rows]})
             if path == "/api/health":
                 return self._json({"ok": True, "mode": "sumo_editor", "token": token,
                                    "modsource": MODSOURCE})
@@ -104,16 +130,23 @@ def make_handler(workspace, html, token):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=41772)
-    parser.add_argument("--workspace", type=Path, default=HERE / "editor_workspace" / "sumo_editor.sqlite")
+    parser.add_argument("--workspace", type=Path, default=None)
     parser.add_argument("--artifact", type=Path, default=None)
     parser.add_argument("--check", action="store_true", help="dry run: validate sources and snapshot without creating a workspace")
     args = parser.parse_args()
+    if args.workspace is None:
+        active=HERE / 'current_release.json'
+        config=json.loads(active.read_text(encoding='utf8')) if active.exists() else {}
+        filename=config.get('workspace','sumo_editor.sqlite')
+        if Path(filename).name!=filename: parser.error('Workspace must be a filename')
+        args.workspace=HERE / 'editor_workspace' / filename
     if not 10000 < args.port < 65536:
         parser.error("choose an unassigned ephemeral port above 10000")
     html, baseline = load_artifact(args.artifact or artifact())
     # Preserve source line endings: hashes and unified diffs must match the
     # actual Windows checkout, not a silently normalized LF copy.
-    sources = {p.name: p.read_bytes().decode("utf-8") for p in sorted((HERE.parent / "sumo_src").glob("*.kif"))}
+    source_root=HERE.parent / 'sumo_src'
+    sources = {p.relative_to(source_root).as_posix(): p.read_bytes().decode("utf-8") for p in sorted(source_root.rglob("*.kif"))}
     if not sources:
         parser.error("vendored SUMO KIF sources are required")
     if args.check:

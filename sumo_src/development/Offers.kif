@@ -1,0 +1,361 @@
+;; ============================================================================
+;;                   REARDEN COMMERCE, INC.
+;;                    FlashOffers Ontology
+;; ============================================================================
+
+;; Created by: Valeria de Paiva (vdepaiva [at] reardencommerce [dot] com)
+;; Created on: October 31st, 2011
+;;  
+;; Description:  This describes concepts related to flash offers, 
+;; starting from the offers described in the file on deals, email from
+;;
+
+;; Ontology dependencies for FlashOffers.kif: 
+;; Merge.kif
+;; Mid-level-ontology.kif 
+;; Catalog.kif
+
+;; Access to and use of these products is governed by the GNU General Public 
+;; License <http://www.gnu.org/copyleft/gpl.html>. 
+;; By using these products, you agree to be bound by the terms  of the GPL.
+;; We ask the people using or referencing this work cite our primary paper:
+;; Niles, I., and Pease, A.  2001.  Towards a Standard Upper Ontology.  In 
+;; Proceedings of the 2nd International Conference on Formal Ontology in 
+;; Information Systems (FOIS-2001), Chris Welty and Barry Smith, eds, 
+;; Ogunquit, Maine, October 17-19, 2001.  See also http://www.ontologyportal.org
+
+;; Many of the offers are classes: exercise, art, acting, computer training, etc.
+;; class in WN maps to EducationalProcess in Merge.kif 9417-9418
+;; also have EducationalCourse a
+;; subclass of EducationalProgram
+;;--------------------------------------------------------------------
+;;  CLASSES
+
+(subclass LearningMeeting Meeting)
+(subclass LearningClass LearningMeeting)
+
+(=>
+  (instance ?CLASS LearningClass)
+  (exists (?MEET ?LEARN)
+    (and
+      (instance ?MEET LearningMeeting)
+      (instance ?LEARN Learning))))
+      
+;;
+;; Jennie Pease 8the January 2023
+;; commented out because the first argument for hasSkill needs to be a class not an instance
+;; this axioms may require more thought to rewrite
+;;
+;;(=>
+;;  (instance ?CLASS LearningClass)
+;;  (exists (?PERSON1 ?PERSON2 ?SUBJ ?LEARN)
+;;    (and
+;;      (hasSkill ?SUBJ ?PERSON1)
+;;      (not (hasSkill ?SUBJ ?PERSON2))
+;;      (subProcess ?CLASS ?LEARN)
+;;      (instance ?LEARN Learning)
+;;      (agent ?LEARN ?PERSON2)
+;;      (refers ?CLASS ?SUBJ))))
+
+(subclass LearningClass EducationalProcess)
+
+;; classes can be (at least) for artistic activities or for fitness or for work improvement or for entertainment purposes
+
+;; For any of  the sports in Sports.kif we can have a SportClass:
+;; either a 1-to-1 (private class) or a group class where the sport is taught by someone who has expertise on that sport.
+
+;; ClassOnSportFn
+;;
+;; Jennie Pease 8th January 2023
+;; commented out ClassOnSportFn as the first argument ?CLASS for hasSkill requires a class but the axioms refer ?CLASS as an instance
+;;
+;; ClassOnSportFn
+;; For each sport we can have a class that is teaching that sport for a given (short) amount of time.
+;;(documentation ClassOnSportFn EnglishLanguage "A unary function that, when given a ?SPORT will return an instance of a class associated with that sport, e.g. (ClassOnSportFn MountainBiking),
+;;is an instance of an LearningClass on the sport of Mountain biking.")
+;;(domain ClassOnSportFn 1 Sport)
+;;(instance ClassOnSportFn UnaryFunction)
+;;(range ClassOnSportFn LearningClass)
+;;
+
+(subclass MountainBike Bicycle)
+(subclass ElectricBike Bicycle)
+
+;;
+;; (ClassOnSportFn Soccer) is a class on which someone teaches and someone learns something about &%Soccer
+;;(=>
+;;  (ClassOnSportFn ?SPORT)
+;;  (exists (?PERSON1 ?PERSON2 ?CLASS)
+;;    (and
+;;      (hasSkill ?SPORT ?PERSON1)
+;;      (not (hasSkill ?SPORT ?PERSON2))
+;;      (instance ?CLASS LearningClass)
+;;      (refers ?CLASS ?SPORT))))
+;; must make sure that all the Sports in the HomeRun offers are available on Sports.kif. 
+    
+;; --------------------------------------------------------------------------------------
+;; ClassOnAcademicFieldFn
+
+;; For each academic field of study we can have a class that is teaching that academic field or activity for a given (short) amount of time. 
+(documentation ClassOnAcademicFieldFn EnglishLanguage "A unary function that, when given a ?FIELDOFSTUFY will return an instance of class associated with that field of study, e.g. (ClassOnAcademicFieldFn Astronomy), is an instance of an LearningClass on  &%Astronomy.")
+(domain ClassOnAcademicFieldFn 1 Sport)     
+(instance ClassOnAcademicFieldFn UnaryFunction)     
+(range ClassOnAcademicFieldFn LearningClass)
+
+; added Paleontology for digging class
+
+; also Foreign languages give rise to classes to learn to speak/write on them
+(documentation ClassOnLanguageFn EnglishLanguage "A unary function that, when given a ?LANGUAGE  returns an instance of learning class associated with that language, 
+ e.g. (ClassOnLanguageFn French), is an instance of an LearningClass on  &%French.")
+(domain ClassOnLanguageFn 1 Language)     
+(instance ClassOnLanguageFn UnaryFunction)     
+(range ClassOnLanguageFn LearningClass)
+
+;; Languages.kif has all languages in a very detailed way, but they're not connected in particular they're not subs of NaturalLanguage, adding this sub here
+;; in Mid-level-ontology.kif we only have
+;(instance EnglishLanguage NaturalLanguage)  Merge.kif 1254-1254     
+;(instance FrenchLanguage NaturalLanguage)   Mid-level-ontology.kif 11177-11177  
+;(instance GermanLanguage NaturalLanguage)   Mid-level-ontology.kif 11182-11182  
+;(instance GreekLanguage NaturalLanguage)    Mid-level-ontology.kif 11187-11187  
+;(instance LatinLanguage NaturalLanguage)    Mid-level-ontology.kif 11191-11191  
+;(instance RussianLanguage NaturalLanguage)  Mid-level-ontology.kif 11196-11196  
+;(instance SpanishLanguage NaturalLanguage)
+;; Adding other natural languages first the ones with more than 50 million native speakers 
+;; http://en.wikipedia.org/wiki/List_of_languages_by_number_of_native_speakers
+;; Need to add all of the languages at some stage
+(subclass ChineseLanguage NaturalLanguage) ; Has dialects: Mandarin, Cantonese, etc.
+(instance PortugueseLanguage NaturalLanguage)
+(instance UrduLanguage NaturalLanguage)
+(instance ArabicLanguage NaturalLanguage)
+(instance BengaliLanguage NaturalLanguage)
+(instance JapaneseLanguage NaturalLanguage)
+(instance HindiLanguage NaturalLanguage)
+;Wikipedia talks about PunjabiLanguage which our ontologist didn't consider, I think
+(instance JavaneseLanguage NaturalLanguage)
+;(instance WuLanguage NaturalLanguage) ??
+(instance TeluguLanguage NaturalLanguage)
+(instance VietnameseLanguage NaturalLanguage)
+(instance MarathiLanguage NaturalLanguage)
+(instance KoreanLanguage NaturalLanguage)
+(instance TamilLanguage NaturalLanguage)
+; (instance CantoneseLanguage NaturalLanguage)
+(instance TurkishLanguage NaturalLanguage)
+(subclass PashtoLanguage NaturalLanguage) ; Has dialects: Central, Northern, Southern, Waneci
+(instance ItalianLanguage NaturalLanguage)
+; 50 million
+(instance TaiwaneseLanguage NaturalLanguage)
+;(instance GujaratiLanguage NaturalLanguage)
+(instance PolishLanguage NaturalLanguage)
+(subclass PersianLanguage NaturalLanguage) ; Has dialects: Aimaq, Bukharic, Farsi, etc.
+;(instance BengaliLanguage NaturalLanguage)
+;(instance BengaliLanguage NaturalLanguage)
+(instance UcranianLanguage NaturalLanguage)
+(instance MalayLanguage NaturalLanguage)
+(instance DutchLanguage NaturalLanguage)
+(instance FlemishLanguage NaturalLanguage)
+(instance RomanianLanguage NaturalLanguage)
+(instance CzechLanguage NaturalLanguage)
+(instance TagalogLanguage NaturalLanguage)
+;;-----------------------------------------------------------------------------------------
+
+;; ClassOnArtFn
+
+;; For each artistic activity we could have a class that is teaching that artistic activity for a given (short) amount of time, but we don't have a concept of ArtisticActivity. 
+;(documentation ClassOnArtFn EnglishLanguage "A unary function that, when given a ?ART will return an instance of class associated with that sport, e.g. (ClassOnArtFn Dancing), is an instance of an EducationalProcess on the art  of &%Dancing.")
+;(domain ClassOnArttFn 1 Process)     
+;(instance ClassOnArtFn UnaryFunction)     
+;(range ClassOnArtFn EducationalProcess)
+
+;examples : Cooking, Dancing, Drawing, Painting, ScreenPrinting
+
+(subclass DanceClass EducationalProcess)
+
+(=>
+  (instance ?CLASS DanceClass)
+  (exists (?PROC)
+    (and
+      (instance ?PROC Dancing)
+      (subProcess ?PROC ?CLASS))))
+
+(subclass PhotographyClass EducationalProcess)
+(=> 
+  (instance ?CLASS PhotographyClass)
+  (exists (?PROC)
+    (and
+      (instance ?PROC Photographing)
+      (subProcess ?PROC ?CLASS))))
+
+(subclass MusicClass EducationalProcess)
+(=>
+  (instance ?CLASS MusicClass)
+  (exists (?PROC)
+    (and
+      (instance ?PROC MakingMusic)
+      (subProcess ?PROC ?CLASS))))
+      
+;; there are also all the classes on learning to play a musical instrument  e.g.
+;;(subclass GuitarLesson MusicClass)      Need a function here too:
+(documentation LessonOnInstrumentFn EnglishLanguage "A unary function that, when given a musical ?INSTRUMENT will return an instance of class associated with learning  that instrument, e.g. (LessonOnInstrumentFn Piano), is an instance of an EducationalProcess on learning to play the  &%Piano.")
+(domain LessonOnInstrumentFn 1 MusicalInstrument)     
+(instance LessonOnInstrumentFn UnaryFunction)     
+(range LessonOnInstrumentFn EducationalProcess)
+      
+(subclass ActingClass EducationalProcess)
+(=>
+  (instance ?CLASS ActingClass)
+  (exists (?PROC)
+    (and
+      (instance ?PROC DramaticActing)
+      (subProcess ?PROC ?CLASS))))   
+
+;;-------------------------------------
+;; commented out in Economy.kif, removing here after discussion with Adam
+;(subclass Handicraft Artifact)
+;documentation Handicraft EnglishLanguage "&%Handicraft is the class of &%Artifacts that are made by hand with a special skill.")
+;(subclass HandwovenCarpet TextileArtifact)
+;(subclass HandwovenCarpet Handicraft) 
+;(subclass HandMadeCard Handicraft) 
+;(subclass HandMadeJewelry Handicraft) 
+;(subclass HandMadeJewelry Jewelry)  
+
+; SUMO has HolidayCard: making it a tad more general, calling it greeting card, at least it works for birthdays and sympathy too
+(subclass HolidayCard GreetingCard)  
+(subclass GreetingCard ContentBearingObject)
+;(subclass HolidayCard ContentBearingObject)
+(documentation GreetingCard EnglishLanguage "a rectangular piece of stiff paper used to send messages - may have printed greetings or pictures.")
+
+; meant to include CardMakingClass, JewelryMakingClass, PaintingClass, FloralDesignClass, Pottery making/decorating, etc...
+; Should this include FilmMaking, Painting, Drawing too?
+
+(subclass ArtMakingClass EducationalProcess)
+
+(=>
+  (instance ?CLASS ArtMakingClass)
+  (exists (?PROC ?ART)
+    (and
+      (instance ?PROC Making)
+      (patient ?PROC ?ART)
+      (instance ?ART ArtWork)
+      (subProcess ?PROC ?CLASS))))
+      
+ ;;---------------------------------------------
+(subclass CookingClass EducationalProcess)
+
+(=>
+  (instance ?CLASS CookingClass)
+  (exists (?PROC)
+    (and
+      (instance ?PROC Cooking)
+      (subProcess ?PROC ?CLASS))))
+ 
+; HomeRun calls it mixology, sometimes. bar tending 95k hits, bartending 165K hits nov2011   
+   
+(subclass BartendingClass EducationalProcess) 
+
+(subclass WineMakingClass EducationalProcess) 
+
+(=>
+  (instance ?CLASS WineMakingClass)
+  (exists (?PROC ?WINE)
+    (and
+      (instance ?PROC Making)
+      (result ?PROC ?WINE)
+      (instance ?WINE Wine)
+      (subProcess ?PROC ?CLASS))))
+
+(subclass BreadMakingClass CookingClass)  
+(=>
+  (instance ?CLASS BreadMakingClass)
+  (exists (?PROC)
+    (and
+      (instance ?PROC Cooking)
+      (result ?PROC BreadOrBiscuit)
+      (subProcess ?PROC ?CLASS))))   
+      
+(subclass TruffleDessert Chocolate)
+(subclass Dessert PreparedFood)
+(documentation Dessert EnglishLanguage "In cultures around the world, dessert is a course that typically comes at the end of a meal, usually consisting of sweet food.")
+(documentation TruffleDessert EnglishLanguage "Truffle is a creamy chocolate dessert.")   
+(subclass ChocolateMakingClass CookingClass)
+(subclass DessertMakingClass CookingClass)
+(subclass TruffleMakingClass ChocolateMakingClass)
+(subclass Gnocchi PreparedFood)
+(documentation Gnocchi EnglishLanguage "Gnocchi are various thick, soft dumplings, often made of potatoes.")
+; HomeRun has classes on truffles, gnocchi, tortillas and desserts and 
+(subclass TortilladePatatas PreparedFood)
+(documentation TortilladePatatas EnglishLanguage "is a typically Spanish dish consisting of a thick egg omelette made with potatoes and fried in olive oil.")
+
+; wine appreciation and wine pairing with food classes?
+; for any food can we have a class cooking that PreparedFood? YES.
+(documentation LessonOnCookingFoodFn EnglishLanguage "A unary function that, when given a prepared food ?FOOD will return an instance of class 
+associated with learning  to make that food, e.g. (LessonOnCookingFoodFn Gnocchi), is an instance of an EducationalProcess on learning how to make &%Gnocchi.")
+(domain LessonOnCookingFoodFn 1 PreparedFood)     
+(instance LessonOnCookingFoodFn UnaryFunction)     
+(range LessonOnCookingFoodFn CookingClass)
+
+(=>
+  (instance ?CLASS (LessonOnCookingFoodFn ?FOOD))
+  (exists (?PROC)
+    (and
+      (instance ?PROC Cooking)
+      (result ?PROC ?FOOD)
+      (subProcess ?PROC ?CLASS))))
+;;--------------------------------------------------------------------------------------------------------
+;; Entertainment Activities that are not sports or arts
+
+(subclass Hiking Walking)
+(documentation Hiking EnglishLanguage "The process of taking a  a long walk usually for exercise or pleasure.")      
+(subclass WalkingTour Walking)
+
+(subclass WalkingTour TourService)
+(documentation WalkingTour EnglishLanguage "A walking tour  is a full or partial-day tour of one or more tourist 
+destinations, which can be led by a tour guide, an escort, or be self-guided.")
+
+(subclass ZoologicalGarden StationaryArtifact)
+(documentation ZoologicalGarden EnglishLanguage "A zoological garden, zoological park, menagerie, or zoo is a facility in which animals are confined within enclosures, 
+displayed to the public, and in which they may also be bred.")
+(subclass BotanicalGarden StationaryArtifact)
+(documentation BotanicalGarden EnglishLanguage "A facility where trees and shrubs are cultivated for exhibition.") 
+
+;; many kinds of IndoorPlayground with admission fees, sometimes with people to help entertain or teach young kids, 
+;; examples include Chuck E Cheese, The jungle, etc
+(subclass IndoorPlayground Building)
+
+;; many offers are tours of Boston, New York and San Francisco, by bike, walking, by trolley, by limo, etc..
+
+(documentation TourOnAreaFn EnglishLanguage "A unary function that, when given a
+?AREA returns an instance of a tour service associated with that region, e.g.
+(TourOnAreaFn BostonMassachusetts), is an instance of a TourService in
+&%BostonMassachusetts.")
+
+(domain TourOnAreaFn 1 GeographicArea)     
+(instance TourOnAreaFn UnaryFunction)     
+(range TourOnAreaFn TourService)
+
+;; zillions of Wine tastings, WN has: wine tasting is a gathering of people to taste and compare different wines. 
+
+(subclass WineTasting Meeting)
+(documentation WineTasting EnglishLanguage "Wine tasting is a gathering of people to taste and compare different wines [c/o WordNet].")
+(=>
+  (instance ?WT WineTasting)
+  (hasPurpose ?WT
+    (exists (?D ?W)
+      (and
+        (instance ?D Drinking)
+        (patient ?D ?W)
+        (instance ?W Wine)
+        (located ?D ?WT)))))
+        
+;; jave also rum tasting and tequilla tasting, worth making a function? I guess so  
+
+(subclass BeverageTasting Meeting)
+(documentation BeverageTasting EnglishLanguage "Beverage tasting is  a gathering of people to taste and compare different types of a given &%Beverage, usually an alcoholic one.")
+(=>
+  (instance ?BT BeverageTasting)
+  (hasPurpose ?BT
+    (exists (?D ?B)
+      (and
+        (instance ?D Drinking)
+        (patient ?D ?B)
+        (instance ?B Beverage)
+        (located ?D ?BT)))))

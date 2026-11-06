@@ -9,8 +9,8 @@ the contributions and copyright holders named in its source files.
 Project: https://www.ontologyportal.org  
 Source repository: https://github.com/ontologyportal/sumo
 
-The release contains an unmodified snapshot of the 74 root-level KIF files needed
-by this editor and the original `README.txt`. File hashes and the snapshot revision
+The release contains an unmodified snapshot of the 145 KIF files, including domain, development, test, mapping and translation material, used
+by this catalog and the original `README.txt`. File hashes and the snapshot revision
 are in `PACKAGE_MANIFEST.json`. Existing headers and notices remain intact.
 
 The original `Merge.kif` header credits the Institute of Electrical and Electronics

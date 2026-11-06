@@ -9,7 +9,7 @@
 | **Claude** | SUMO–LCC mapping, reconciliation and source-data checks; initial viewer brief |
 | **Grok** | SUMO–LCC mapping and independent adversarial checks |
 | **GPT / Astra** | SUMO–LCC mapping and independent falsification |
-| **GPT / Codex** | SUMO tree editor implementation and validation; enhanced GitHub package; revised user guide, operations guide and YouTube narration draft |
+| **GPT / Codex** | SUMO tree editor implementation and validation; complete-source catalog; column-step navigation and performance improvements; portable release packaging and validation; user documentation |
 | **SUMO maintainers and contributors** | The ontology, its documentation and continuing maintenance; original authors and copyright holders are credited in the bundled source notices |
 | **Library of Congress** | LCC outline, captions, schedule notes and classification guidance |
 
